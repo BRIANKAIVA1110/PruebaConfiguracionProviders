@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PepeConfiguration;
-using Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +27,6 @@ namespace PruebaConfiguracion
             services.Configure<AppSetting>(Configuration.GetSection(AppSetting.Seccion));
 
             services.AddControllersWithViews();
-            services.AddServiceLayer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

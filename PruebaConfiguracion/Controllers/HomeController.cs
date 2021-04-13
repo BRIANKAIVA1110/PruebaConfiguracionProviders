@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using PruebaConfiguracion.Models;
-using Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,14 +15,12 @@ namespace PruebaConfiguracion.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IService _service;
         private readonly IConfiguration _configuration;
         private readonly AppSetting _options;
 
-        public HomeController(ILogger<HomeController> logger, IService service, IOptions<AppSetting> options, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IOptions<AppSetting> options, IConfiguration configuration)
         {
             _logger = logger;
-            this._service = service;
             this._configuration = configuration;
             this._options = options.Value;
         }
@@ -44,7 +41,7 @@ namespace PruebaConfiguracion.Controllers
             var section3 = _configuration["ASPNETCORE_ENVIRONMENT"];
             
             var conf = this._options;
-            _service.GetNumber();
+
             return View();
         }
 

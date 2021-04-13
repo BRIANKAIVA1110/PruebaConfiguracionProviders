@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PepeConfiguration\PepeConfiguration.csproj" />
-    <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>

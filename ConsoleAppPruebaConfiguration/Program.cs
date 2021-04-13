@@ -18,16 +18,14 @@ namespace ConsoleAppPruebaConfiguration
                 config.ReloadAnyTime = true;
                 config.TimeReloadAt = TimeSpan.FromSeconds(5);
             }).Build();
-            
-            
-
-            var section = _configuration["PEPE:NOMBRE"];
-
-            Console.WriteLine($"Informacion configuracion: {section}");
-            Console.WriteLine("Hello World!");
 
 
-            Console.ReadKey();
+            while (true)
+            {
+                var section = _configuration["PEPE:NOMBRE"];
+                Console.WriteLine($"Informacion configuracion: {section}");
+            }
+
         }
     }
 }
