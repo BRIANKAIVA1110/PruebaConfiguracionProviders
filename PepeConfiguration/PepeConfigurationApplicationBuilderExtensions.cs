@@ -12,9 +12,9 @@ namespace PepeConfiguration
 
         public static IApplicationBuilder UsePepeConfiguration(this IApplicationBuilder builder) 
         {
-            builder.Use(async(context, next) =>
+            builder.Use(async(httpContext, next) =>
             {
-                var configurationRoot = context.RequestServices.GetService(typeof(IConfiguration)) as ConfigurationRoot;
+                var configurationRoot = httpContext.RequestServices.GetService(typeof(IConfiguration)) as ConfigurationRoot;
 
                 var dataBaseConfigurationProvider = configurationRoot.Providers.First(x => x is DataBaseConfigurationProvider);
                 dataBaseConfigurationProvider.Load();

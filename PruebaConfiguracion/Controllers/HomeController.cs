@@ -27,20 +27,14 @@ namespace PruebaConfiguracion.Controllers
 
         public IActionResult Index()
         {
-            var a = _configuration as ConfigurationRoot;
-
-            foreach (var item in a.Providers)
-            {
-                if (item is DataBaseConfigurationProvider)
-                {
-                    item.Load();
-                }
-            }
-            var section = _configuration["PEPE:nombre"];
+            
+            var section = _configuration["PEPE:NOMBRE"];
             var section2 = _configuration["IIS_USER_HOME"];
             var section3 = _configuration["ASPNETCORE_ENVIRONMENT"];
             
             var conf = this._options;
+
+            ViewBag.Data = section;
 
             return View();
         }
