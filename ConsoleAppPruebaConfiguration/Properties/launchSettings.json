@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "ConsoleAppPruebaConfiguration": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_CONSOLEAPP": "Development"
+      }
+    }
+  }
+}
