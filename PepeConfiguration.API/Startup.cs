@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using PepeConfiguration.API.Infraestructura;
+using Microsoft.OpenApi.Models;
 
 namespace PepeConfiguration.API
 {
@@ -36,6 +37,12 @@ namespace PepeConfiguration.API
             {
                 config.UseSqlServer(@"Server = DESKTOP-J4947VK\SQLEXPRESS; Database = PruebaRestful; Integrated Security = True; ");
             });
+
+
+            services.AddSwaggerGen(c=>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Configuracion Centralizada", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,13 +57,23 @@ namespace PepeConfiguration.API
 
             app.UseRouting();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c=>
+            {
+                c.SwaggerEndpoint("v1/swagger.json", "Configuracion Centralizada");
+            });
+
             app.UseAuthorization();
+
+           
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapHub<PepeConfigurationHub>("/pepeConfiguracion");
             });
+
+           
         }
     }
 }
