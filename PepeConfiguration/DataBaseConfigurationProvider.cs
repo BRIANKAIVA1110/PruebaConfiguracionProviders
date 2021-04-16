@@ -16,75 +16,48 @@ namespace PepeConfiguration
     {
         private readonly IDbConnection _connection;
         private readonly PepeConfigurationOptions _configure;
-
-        private static CancellationTokenSource _cancellationToken;
+        private HubConnection _hubConnection;
 
         public DataBaseConfigurationProvider(PepeConfigurationOptions configure)
         {
             this._configure = configure;
-            this._connection = new SqlConnection(configure.DataSourceConnectionString);//manejar exepcion
+            this._connection = new SqlConnection(configure.DataSourceConnectionString);//manejar exepcion, DI??
 
-            if (!(configure.EndpointHubListerner is null)) 
-            {
-                var _connection = new HubConnectionBuilder().WithUrl(configure.EndpointHubListerner)
-                .Build();
-
-                _connection.StartAsync().Wait();
-                //EL TOPIC DEBE SER DINAMICO...
-                _connection.On<string>("pepeTopic", async (x) =>
-                {
-                    await LoadAsync();
-                });
-            }
+            InicializarClientListenerCambiosConfiguracion(configure.EndpointHubListerner);
         }
-
-        static DataBaseConfigurationProvider() 
+        
+        public override void Load()
         {
-            _cancellationToken = new CancellationTokenSource();
-        }
 
-        public override async void Load()
-        {
-            if (!_configure.ReloadAnyTime)
-            {
-                Task.WaitAll(LoadAsync());
-            }
-            else 
-            {
-                //por lo menos 1 vez tiene que esperar a que se ejecute... despues como "subproceso"
-                Task.WaitAll(LoadAsync());// por lo menos 1 vez se tiene que esperar 
-                await Task.Delay(_configure.TimeReloadAt, _cancellationToken.Token);
-                await Task.Run(PollForChangesAsync, _cancellationToken.Token);
-            }
-        }
-
-        private async Task LoadAsync() 
-        {
+            /*
+             * HTTP GET DE CONFIG
+             */
             string sqlQuery = "select Section, [key], Value from configurations";//deberia estar en otra clase "dbContext | repository"
-            var configuraciones = await _connection.QueryAsync<Configuration>(sqlQuery);//deberia estar en otra clase "dbContext | repository"
+            var configuraciones =  _connection.Query<Configuration>(sqlQuery);//deberia estar en otra clase "dbContext | repository"
 
             //if "lastModifed" != db.lastModifed <- ver factibilidad
             var dataFromDataBase = configuraciones.ToDictionary(x => $"{ x.Section }:{ x.Key }", x => x.Value);
 
             Data = dataFromDataBase;
-
-            if (_configure.ReloadAnyTime)
-                await Task.Delay(_configure.TimeReloadAt, _cancellationToken.Token);
         }
 
-        private async Task PollForChangesAsync() 
+        private void InicializarClientListenerCambiosConfiguracion(string endpointHubListerner) 
         {
-            if (_configure.ReloadAnyTime)
-                while (!_cancellationToken.IsCancellationRequested) 
-                        await LoadAsync();
-           
+            _hubConnection = new HubConnectionBuilder().WithUrl(endpointHubListerner)
+            .Build();
+
+            _hubConnection.StartAsync().Wait();//MANEJAR Exception CUANDO EL SERVER NO ESTA INICIADO
+            //EL TOPIC DEBE SER DINAMICO...
+            //SE SUPONE QUE ESTO GENERA POR REFLECTION UN METODO "pepeTopic" CON FUNCIONALIDAD SEGUN EXPRE LAMBDA.
+            //AL CREAR EL METODO POR REFLECTION EL SERVIDOR ES EL QUE EJECUTARIA ESTE METODO.
+            //LOS CLIENTES TAMBIEN PUEDE EJECUTAR METODOS DEL SERVIDOR -> "_connection.InvokeAsync(SendMessage, ....)"
+            _hubConnection.On<string>("pepeTopic", (x) => Load()); 
         }
 
-
-        public void Dispose()
+        public async void Dispose() //si se genera una exeption en un metodo async con retorno void, si no me equivoco, hace que falle la ejecucion del sistema. leer sobre el tema.
         {
             _connection.Dispose();
-            _cancellationToken.Cancel();
+            await _hubConnection.DisposeAsync();
         }
 
     }
