@@ -16,9 +16,9 @@ namespace PruebaConfiguracion.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly AppSetting _options;
+        private AppSetting _options;
 
-        public HomeController(ILogger<HomeController> logger, IOptions<AppSetting> options, IConfiguration configuration)
+        public HomeController(ILogger<HomeController> logger, IOptionsSnapshot<AppSetting> options, IConfiguration configuration)
         {
             _logger = logger;
             this._configuration = configuration;
@@ -29,6 +29,7 @@ namespace PruebaConfiguracion.Controllers
         {
             
             var section = _configuration["PEPE:NOMBRE"];
+             _configuration.GetSection("PEPE:PEPE2").Bind(_options);
             var section2 = _configuration["IIS_USER_HOME"];
             var section3 = _configuration["ASPNETCORE_ENVIRONMENT"];
             

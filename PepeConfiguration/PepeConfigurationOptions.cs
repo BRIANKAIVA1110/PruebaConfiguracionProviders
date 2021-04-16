@@ -12,5 +12,7 @@ namespace PepeConfiguration
         public string ApplicationName { get; set; }
         public bool ReloadAnyTime { get; set; }
         public TimeSpan TimeReloadAt { get; set; }
+
+        public string EndpointHubListerner { get; set; }
     }
 }

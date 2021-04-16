@@ -13,8 +13,12 @@ namespace PruebaConfiguracion
     public class Program
     {
         private const string DataSourceConnectionString = @"Server = DESKTOP-J4947VK\SQLEXPRESS; Database = PruebaRestful; Integrated Security = True;";
+        private const string EndPointHubListener = @"https://localhost:44325/pepeConfiguracion";
         public static void Main(string[] args)
         {
+            var a = Environment.GetEnvironmentVariables();
+
+
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -30,6 +34,11 @@ namespace PruebaConfiguracion
                         config.Credentials = "";
                         config.Environment = env.EnvironmentName;
                         config.ApplicationName = env.ApplicationName;
+                        config.EndpointHubListerner = EndPointHubListener;
+
+
+                        //config.ReloadAnyTime = true;
+                        //config.TimeReloadAt = TimeSpan.FromSeconds(4);
                     });
                 })
                 .ConfigureWebHostDefaults(webBuilder =>

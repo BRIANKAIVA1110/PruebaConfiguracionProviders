@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace PepeConfiguration
 {
@@ -15,73 +16,48 @@ namespace PepeConfiguration
     {
         private readonly IDbConnection _connection;
         private readonly PepeConfigurationOptions _configure;
-        private bool _isFirsExcution = true;
-
-        private static CancellationTokenSource _cancellationToken;
+        private HubConnection _hubConnection;
 
         public DataBaseConfigurationProvider(PepeConfigurationOptions configure)
         {
             this._configure = configure;
-            this._connection = new SqlConnection(configure.DataSourceConnectionString);//manejar exepcion
-            
+            this._connection = new SqlConnection(configure.DataSourceConnectionString);//manejar exepcion, DI??
+
+            InicializarClientListenerCambiosConfiguracion(configure.EndpointHubListerner);
         }
-
-        static DataBaseConfigurationProvider() 
+        
+        public override void Load()
         {
-            _cancellationToken = new CancellationTokenSource();
-        }
 
-        public override async void Load()
-        {
-            if (!_configure.ReloadAnyTime) 
-            {
-                Task.WaitAll(LoadAsync());
-                _isFirsExcution = false;
-            }
+            /*
+             * HTTP GET DE CONFIG
+             */
+            string sqlQuery = "select Section, [key], Value from configurations";//deberia estar en otra clase "dbContext | repository"
+            var configuraciones =  _connection.Query<Configuration>(sqlQuery);//deberia estar en otra clase "dbContext | repository"
 
-            //por lo menos 1 vez tiene que esperar a que se ejecute..despues como sub
-            if (_isFirsExcution) 
-            {
-                Task.WaitAll(LoadAsync());// por lo menos 1 vez se tiene que esperar 
-                _isFirsExcution = false;
-                await Task.Run(PollForChangesAsync, _cancellationToken.Token);
-            }
-                
-        }
-
-        private async Task LoadAsync() 
-        {
-            var dataFromDataBase = new Dictionary<string, string>();
-
-            string sqlQuery = "select Section, [key], Value from configurations";
-            var configuraciones = await _connection.QueryAsync<Configuration>(sqlQuery);
-
-            foreach (var item in configuraciones)
-            {
-                dataFromDataBase.Add($"{item.Section}:{item.Key}", item.Value);
-            }
+            //if "lastModifed" != db.lastModifed <- ver factibilidad
+            var dataFromDataBase = configuraciones.ToDictionary(x => $"{ x.Section }:{ x.Key }", x => x.Value);
 
             Data = dataFromDataBase;
-
-            if (_configure.ReloadAnyTime)
-                await Task.Delay(_configure.TimeReloadAt, _cancellationToken.Token);
         }
 
-        private async Task PollForChangesAsync() 
+        private void InicializarClientListenerCambiosConfiguracion(string endpointHubListerner) 
         {
-            if (_configure.ReloadAnyTime)
-                while (!_cancellationToken.IsCancellationRequested) 
-                    if(!_isFirsExcution)
-                        await LoadAsync();
-            else 
-                await LoadAsync();
+            _hubConnection = new HubConnectionBuilder().WithUrl(endpointHubListerner)
+            .Build();
+
+            _hubConnection.StartAsync().Wait();//MANEJAR Exception CUANDO EL SERVER NO ESTA INICIADO
+            //EL TOPIC DEBE SER DINAMICO...
+            //SE SUPONE QUE ESTO GENERA POR REFLECTION UN METODO "pepeTopic" CON FUNCIONALIDAD SEGUN EXPRE LAMBDA.
+            //AL CREAR EL METODO POR REFLECTION EL SERVIDOR ES EL QUE EJECUTARIA ESTE METODO.
+            //LOS CLIENTES TAMBIEN PUEDE EJECUTAR METODOS DEL SERVIDOR -> "_connection.InvokeAsync(SendMessage, ....)"
+            _hubConnection.On<string>("pepeTopic", (x) => Load()); 
         }
 
-
-        public void Dispose()
+        public async void Dispose() //si se genera una exeption en un metodo async con retorno void, si no me equivoco, hace que falle la ejecucion del sistema. leer sobre el tema.
         {
             _connection.Dispose();
-            _cancellationToken.Cancel();
+            await _hubConnection.DisposeAsync();
         }
 
     }

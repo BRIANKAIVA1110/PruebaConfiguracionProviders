@@ -19,7 +19,6 @@ namespace ConsoleAppPruebaConfiguration
                 config.TimeReloadAt = TimeSpan.FromSeconds(5);
             }).Build();
 
-
             while (true)
             {
                 var section = _configuration["PEPE:NOMBRE"];

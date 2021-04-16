@@ -1,16 +1,21 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PepeConfiguration;
+using Microsoft.Extensions.Logging;
+using PepeConfiguration.API.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using PepeConfiguration.API.Infraestructura;
+using Microsoft.OpenApi.Models;
 
-namespace PruebaConfiguracion
+namespace PepeConfiguration.API
 {
     public class Startup
     {
@@ -24,11 +29,20 @@ namespace PruebaConfiguracion
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //AppSetting ass = new();
-            AppSetting options = new AppSetting();
-            services.Configure<AppSetting>(Configuration.GetSection(AppSetting.Seccion));
-            //Configuration.GetSection(AppSetting.Seccion).Bind(options);
-            services.AddControllersWithViews();
+            services.AddControllers();
+            services.AddSignalR();
+
+
+            services.AddDbContext<ApplicationContext>(config =>
+            {
+                config.UseSqlServer(@"Server = DESKTOP-J4947VK\SQLEXPRESS; Database = PruebaRestful; Integrated Security = True; ");
+            });
+
+
+            services.AddSwaggerGen(c=>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Configuracion Centralizada", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,27 +52,28 @@ namespace PruebaConfiguracion
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
+
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c=>
+            {
+                c.SwaggerEndpoint("v1/swagger.json", "Configuracion Centralizada");
+            });
+
             app.UseAuthorization();
 
-            //app.UsePepeConfiguration();
+           
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
+                endpoints.MapHub<PepeConfigurationHub>("/pepeConfiguracion");
             });
+
+           
         }
     }
 }

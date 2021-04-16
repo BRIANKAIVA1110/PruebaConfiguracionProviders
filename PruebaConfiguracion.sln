@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleAppPruebaConfigurati
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A3B5501D-1D59-407C-8C6E-B7DD1580D120}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PepeConfiguration.API", "PepeConfiguration.API\PepeConfiguration.API.csproj", "{A7D717D6-F9A2-4732-AA2C-244030F72022}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{22BA3E27-AEAC-4D26-A02F-52FFE770305A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22BA3E27-AEAC-4D26-A02F-52FFE770305A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22BA3E27-AEAC-4D26-A02F-52FFE770305A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7D717D6-F9A2-4732-AA2C-244030F72022}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7D717D6-F9A2-4732-AA2C-244030F72022}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7D717D6-F9A2-4732-AA2C-244030F72022}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7D717D6-F9A2-4732-AA2C-244030F72022}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
