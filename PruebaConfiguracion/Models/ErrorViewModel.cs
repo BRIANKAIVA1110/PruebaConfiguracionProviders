@@ -1,5 +1,3 @@
-using System;
-
 namespace PruebaConfiguracion.Models
 {
     public class ErrorViewModel

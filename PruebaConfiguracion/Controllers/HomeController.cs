@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using PruebaConfiguracion.Models;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
-using PepeConfiguration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using PruebaConfiguracion.Models;
+using System.Diagnostics;
 
 namespace PruebaConfiguracion.Controllers
 {
@@ -27,12 +22,12 @@ namespace PruebaConfiguracion.Controllers
 
         public IActionResult Index()
         {
-            
+
             var section = _configuration["PEPE:NOMBRE"];
-             _configuration.GetSection("PEPE:PEPE2").Bind(_options);
+            _configuration.GetSection("PEPE:PEPE2").Bind(_options);
             var section2 = _configuration["IIS_USER_HOME"];
             var section3 = _configuration["ASPNETCORE_ENVIRONMENT"];
-            
+
             var conf = this._options;
 
             ViewBag.Data = section;
