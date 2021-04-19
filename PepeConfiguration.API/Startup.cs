@@ -1,19 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using PepeConfiguration.API.Hubs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using PepeConfiguration.API.Infraestructura;
 using Microsoft.OpenApi.Models;
+using PepeConfiguration.API.Hubs;
+using PepeConfiguration.API.Infraestructura;
 
 namespace PepeConfiguration.API
 {
@@ -39,7 +32,7 @@ namespace PepeConfiguration.API
             });
 
 
-            services.AddSwaggerGen(c=>
+            services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Configuracion Centralizada", Version = "v1" });
             });
@@ -58,14 +51,14 @@ namespace PepeConfiguration.API
             app.UseRouting();
 
             app.UseSwagger();
-            app.UseSwaggerUI(c=>
+            app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("v1/swagger.json", "Configuracion Centralizada");
             });
 
             app.UseAuthorization();
 
-           
+
 
             app.UseEndpoints(endpoints =>
             {
@@ -73,7 +66,7 @@ namespace PepeConfiguration.API
                 endpoints.MapHub<PepeConfigurationHub>("/pepeConfiguracion");
             });
 
-           
+
         }
     }
 }
